@@ -10,6 +10,7 @@ le_reflections = joblib.load("saved_models/le_reflection.pkl")
 le_mood = joblib.load("saved_models/le_mood.pkl")
 scaler = joblib.load("saved_models/minmax_scaler.pkl")
 
+
 # Streamlit UI
 st.markdown(
     """
@@ -84,13 +85,17 @@ else:
 # Other inputs
 # student_id = st.sidebar.text_input("Student ID", "S001")
 age = st.sidebar.number_input("Age", 10, 100, 21)
-gpa = st.sidebar.slider("GPA", 0.0, 4.0, 3.0, 0.1)
+gpa = st.sidebar.slider("GPA", 0.0, 5.0, 3.0, 0.1)
 stress = st.sidebar.slider("Stress Level", 1, 10, 5)
 anxiety = st.sidebar.slider("Anxiety Score", 1, 10, 5)
 depression = st.sidebar.slider("Depression Score", 1, 10, 5)
 sleep = st.sidebar.slider("Sleep Hours", 0, 24, 7)
 steps = st.sidebar.number_input("Steps Per Day", 0, 100000, 5000)
 sentiment = st.sidebar.slider("Sentiment Score", -1.0, 1.0, 0.0, 0.01)
+
+# Convert GPA from 5-point scale to 4-point scale
+converted_gpa = (gpa / 5.0) * 4.0
+
 
 # Encode categorical inputs
 gender_enc = le_gender.transform([gender])[0]
@@ -102,7 +107,7 @@ input_data = pd.DataFrame([{
     # 'Student_ID': student_id,
     'Age': age,
     'Gender': gender_enc,
-    'GPA': gpa,
+    'GPA': converted_gpa,
     'Stress_Level': stress,
     'Anxiety_Score': anxiety,
     'Depression_Score': depression,
