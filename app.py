@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+from textblob import TextBlob
 
 # Load model and preprocessing tools
 model = joblib.load("saved_models/stacked_model.pkl")
@@ -67,8 +68,18 @@ st.sidebar.header("📋 Input Student Data")
 
 # Dropdowns using encoder classes
 gender = st.sidebar.selectbox("Gender", le_gender.classes_)
-reflections = st.sidebar.selectbox("Daily Reflections", le_reflections.classes_)
+# reflections = st.sidebar.selectbox("Daily Reflections", le_reflections.classes_)
+reflection_text = st.text_area("Write your reflection for the day")
 mood = st.sidebar.selectbox("Mood Description", le_mood.classes_)
+
+# convert reflections to sentiment score
+if reflection_text:
+    sentiment = TextBlob(reflection_text).sentiment.polarity  # range -1 to +1
+    # Normalize to 0–10 scale (similar to what your model expects)
+    reflection_score = (sentiment + 1) * 5  # because (-1 to 1) -> (0 to 10)
+else:
+    reflection_score = 5.0  # Neutral fallback
+
 
 # Other inputs
 # student_id = st.sidebar.text_input("Student ID", "S001")
@@ -83,7 +94,7 @@ sentiment = st.sidebar.slider("Sentiment Score", -1.0, 1.0, 0.0, 0.01)
 
 # Encode categorical inputs
 gender_enc = le_gender.transform([gender])[0]
-reflections_enc = le_reflections.transform([reflections])[0]
+# reflections_enc = le_reflections.transform([reflections])[0]
 mood_enc = le_mood.transform([mood])[0]
 
 # Build DataFrame in exact model order
@@ -95,7 +106,7 @@ input_data = pd.DataFrame([{
     'Stress_Level': stress,
     'Anxiety_Score': anxiety,
     'Depression_Score': depression,
-    'Daily_Reflections': reflections_enc,
+    'Daily_Reflections': reflection_score,
     'Sleep_Hours': sleep,
     'Steps_Per_Day': steps,
     'Mood_Description': mood_enc,
@@ -134,8 +145,19 @@ if st.button("🔮 Predict Mental Health"):
             "Student_ID": student_id,
             "Student_Name": student_name,
             "Mental_Health_Status": pred_label,
-            **input_data.iloc[0].to_dict()
+            "Age": age,
+            "Gender": gender,  # use original
+            "GPA": gpa,
+            "Stress_Level": stress,
+            "Anxiety_Score": anxiety,
+            "Depression_Score": depression,
+            "Daily_Reflections": reflection_text,  # use original
+            "Sleep_Hours": sleep,
+            "Steps_Per_Day": steps,
+            "Mood_Description": mood,  # use original
+            "Sentiment_Score": sentiment
         }
+
 
         # Append to CSV file
         log_df = pd.DataFrame([result_dict])
@@ -157,11 +179,26 @@ if st.button("📜 Show Saved Logs"):
     except FileNotFoundError:
         st.warning("⚠️ No logs found yet.")
 
-# Button to download logs
-if st.button("💾 Save Logs to File"):
+import os
+
+# Buttons for Save and Delete side by side
+col1, col2 = st.columns([1, 1])
+
+with col1:
     try:
         logs = pd.read_csv("predictions_log.csv")
-        st.download_button("Download CSV", logs.to_csv(index=False), file_name="mental_health_predictions.csv", mime="text/csv")
+        st.download_button("💾 Save Logs to File", logs.to_csv(index=False), file_name="mental_health_predictions.csv", mime="text/csv")
     except FileNotFoundError:
         st.warning("⚠️ No logs found yet to save.")
+
+with col2:
+    if st.button("🗑️ Delete Logs"):
+        try:
+            os.remove("predictions_log.csv")
+            st.success("🗑️ Log file deleted successfully.")
+        except FileNotFoundError:
+            st.warning("⚠️ No log file found to delete.")
+        except Exception as e:
+            st.error(f"An error occurred while deleting: {e}")
+            st.warning("⚠️ No logs found yet to save.")
 
