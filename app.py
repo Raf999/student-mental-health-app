@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load model and preprocessing tools
-model = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/stacked_model.pkl")
+model = joblib.load("saved_models/stacked_model.pkl")
 le_gender = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_gender.pkl")
 le_reflections = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_reflection.pkl")
 le_mood = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_mood.pkl")
