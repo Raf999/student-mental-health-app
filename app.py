@@ -180,51 +180,53 @@ scaled_df = pd.DataFrame(scaled_values, columns=scaler_columns, index=input_data
 # Replace original values with scaled
 input_data[scaler_columns] = scaled_df
 
-#Predict
+# Predict
 if st.button("🔮 Predict Mental Health"):
     st.session_state.show_sidebar_hint = False
-    import datetime
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    try:
-        prediction = model.predict(input_data)
 
-        # Friendly labels
-        mental_health_labels = {
-            0: "Healthy",
-            1: "Mild Mental Health Issues",
-            2: "Severe Mental Health Risk"
-        }
+    if not student_name.strip() or not student_id.strip():
+        st.warning("⚠️ Please enter both your *Name* and *Student ID* before predicting.")
+    else:
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            prediction = model.predict(input_data)
 
-        pred_label = mental_health_labels.get(prediction[0], "Unknown")
-        st.success(f"🧠 Mental Health Status: **{pred_label}**")
-        # Save to file
-        result_dict = {
-            "Timestamp": timestamp,
-            "Student_ID": student_id,
-            "Student_Name": student_name,
-            "Mental_Health_Status": pred_label,
-            "Age": age,
-            "Gender": gender,  # use original
-            "GPA": gpa,
-            "Stress_Level": stress,
-            "Anxiety_Score": anxiety,
-            "Depression_Score": depression,
-            "Daily_Reflections": reflection_text,  # use original
-            "Sleep_Hours": sleep,
-            "Steps_Per_Day": steps,
-            "Mood_Description": mood,  # use original
-            "Sentiment_Score": sentiment
-        }
+            # Friendly labels
+            mental_health_labels = {
+                0: "Healthy",
+                1: "Mild Mental Health Issues",
+                2: "Severe Mental Health Risk"
+            }
 
+            pred_label = mental_health_labels.get(prediction[0], "Unknown")
+            st.success(f"🧠 Mental Health Status: **{pred_label}**")
 
-        # Append to CSV file
-        log_df = pd.DataFrame([result_dict])
-        log_df.to_csv("predictions_log.csv", mode="a", header=not pd.io.common.file_exists("predictions_log.csv"), index=False)
+            # Save to file
+            result_dict = {
+                "Timestamp": timestamp,
+                "Student_ID": student_id,
+                "Student_Name": student_name,
+                "Mental_Health_Status": pred_label,
+                "Age": age,
+                "Gender": gender,
+                "GPA": gpa,
+                "Stress_Level": stress,
+                "Anxiety_Score": anxiety,
+                "Depression_Score": depression,
+                "Daily_Reflections": reflection_text,
+                "Sleep_Hours": sleep,
+                "Steps_Per_Day": steps,
+                "Mood_Description": mood,
+                "Sentiment_Score": sentiment
+            }
 
+            # Append to CSV file
+            log_df = pd.DataFrame([result_dict])
+            log_df.to_csv("predictions_log.csv", mode="a", header=not pd.io.common.file_exists("predictions_log.csv"), index=False)
 
-    except Exception as e:
-        st.error(f"❌ Prediction failed:\n\n{e}")
-
+        except Exception as e:
+            st.error(f"❌ Prediction failed:\n\n{e}")
     # Show buttons after prediction
 st.markdown("---")
 st.subheader("📁 Prediction Logs")
