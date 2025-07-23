@@ -27,3 +27,6 @@ try:
         print("⚠️ scaler.feature_names_in_ not found.")
 except Exception as e:
     print(f"❌ Could not load scaler: {e}")
+    
+import os
+print("Current working directory:", os.getcwd())

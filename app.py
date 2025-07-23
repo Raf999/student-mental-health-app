@@ -4,10 +4,10 @@ import joblib
 
 # Load model and preprocessing tools
 model = joblib.load("saved_models/stacked_model.pkl")
-le_gender = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_gender.pkl")
-le_reflections = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_reflection.pkl")
-le_mood = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/le_mood.pkl")
-scaler = joblib.load("C:/Users/rafiu/OneDrive/Desktop/student-mental-health-app/saved_models/minmax_scaler.pkl")
+le_gender = joblib.load("saved_models/le_gender.pkl")
+le_reflections = joblib.load("saved_models/le_reflection.pkl")
+le_mood = joblib.load("saved_models/le_mood.pkl")
+scaler = joblib.load("saved_models/minmax_scaler.pkl")
 
 # Streamlit UI
 st.markdown(
