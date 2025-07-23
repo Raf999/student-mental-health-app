@@ -3,6 +3,10 @@ import pandas as pd
 import joblib
 from textblob import TextBlob
 
+# Show sidebar hint only on first load
+if 'show_sidebar_hint' not in st.session_state:
+    st.session_state.show_sidebar_hint = True
+
 # Load model and preprocessing tools
 model = joblib.load("saved_models/stacked_model.pkl")
 le_gender = joblib.load("saved_models/le_gender.pkl")
@@ -30,6 +34,7 @@ st.markdown(
             color: white;
             font-size: 24px;
             margin: 0;
+            
         }
 
         .spacer {
@@ -59,6 +64,53 @@ st.markdown(
 # )
 
 st.markdown("Predict mental health status using academic and emotional inputs.")
+
+if st.session_state.show_sidebar_hint:
+    st.markdown(
+        """
+        <style>
+            .sidebar-hint {
+                position: fixed;
+                top: 70px;
+                left: 10px;
+                color: white;
+                padding: 6px 10px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 9999;
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+                animation: bounce 2s infinite;
+            }
+
+            @keyframes bounce {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-5px);
+                }
+            }
+
+            .arrow {
+                display: block;
+                font-size: 14px;
+                text-align: center;
+                margin-top: -10px;
+            }
+
+            @media (min-width: 768px) {
+                .sidebar-hint {
+                    display: none;
+                }
+            }
+        </style>
+
+        <div class="sidebar-hint">
+            <div class="arrow">🔼 Tap here
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 st.sidebar.markdown("## 🧑 Student Information")
@@ -130,6 +182,7 @@ input_data[scaler_columns] = scaled_df
 
 #Predict
 if st.button("🔮 Predict Mental Health"):
+    st.session_state.show_sidebar_hint = False
     import datetime
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
